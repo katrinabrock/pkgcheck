@@ -1,8 +1,6 @@
 
 repo_is_git <- function (path) {
 
-    path <- convert_path (path)
-
     g <- tryCatch (
         gert::git_find (path),
         error = function (e) e
@@ -16,9 +14,9 @@ repo_is_git <- function (path) {
 #' Note the prefix is `pkgcheck`, not `pkgchk_`: This is not a check, just a
 #' function to return summary data.
 #' @noRd
-pkginfo_git_info <- function (path) {
+pkginfo_git_info <- function (path, path_strict = TRUE) {
 
-    path <- convert_path (path)
+    path <- convert_path (path, strict = path_strict)
 
     u <- pkginfo_url_from_desc (path)
 

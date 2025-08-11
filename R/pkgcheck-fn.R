@@ -181,7 +181,7 @@ pkgstats_info <- function (path, use_cache) {
     out$summary <- pkginfo_pkgstats_summary (s)
     out$dependencies <- parse_pkg_deps (s)
 
-    out$git <- pkginfo_git_info (path)
+    out$git <- pkginfo_git_info (path, path_strict = path_strict)
 
     out$srr <- pkginfo_srr_report (path)
 

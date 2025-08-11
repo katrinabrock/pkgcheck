@@ -7,10 +7,13 @@ convert_path <- function (path = ".", strict = TRUE) {
 
     path <- fs::path_norm (path)
 
-    if ( !strict ) if ( !is.null (proj_root <- tryCatch (
-        rprojroot::find_package_root_file (path = path),
-        error = function (e) NULL
-    ))) return (fs::path_norm (proj_root))
+    if ( !strict ) {
+        proj_root <- tryCatch (
+            rprojroot::find_package_root_file (path = path),
+            error = function (e) NULL
+        )
+        if ( !is.null (proj_root)) return (fs::path_norm (proj_root))
+    }
 
     # see also https://github.com/r-lib/usethis/blob/master/R/proj.R
     git_root <- tryCatch (
