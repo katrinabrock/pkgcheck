@@ -54,7 +54,7 @@ pkgcheck <- function (path = ".", goodpractice = TRUE,
         )
     }
 
-    s <- pkgstats_info (path, use_cache)
+    s <- pkgstats_info (path, path_strict, use_cache)
 
     if (nrow (s$stats$objects) == 0L) {
         # There are no R objects/fns; current goodpractice (1.0.2.9000) fails
@@ -158,7 +158,7 @@ checks_running_in_bg <- function (path) {
         !file.exists (stopfile))
 }
 
-pkgstats_info <- function (path, use_cache) {
+pkgstats_info <- function (path, path_strict, use_cache) {
 
     s <- suppressWarnings (
         cache_pkgcheck_component (
