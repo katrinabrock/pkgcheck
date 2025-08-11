@@ -10,6 +10,11 @@
 #' will force checks to be re-run even if the git hash has not changed.
 #' @param extra_env Additional environments from which to collate checks. Other
 #' package names may be appended using `c`, as in `c(.GlobalEnv, "mypkg")`.
+#' @param path_strict No effect if package is not in a git repo. If package
+#' is in a git repo,
+#   * TRUE -> look for the package in git root and its subdirectories.
+#'  * FALSE -> check if there is a package directly at `path` before exploring
+#'    the git root
 #' @return A `pkgcheck` object detailing all package assessments automatically
 #' applied to packages submitted for peer review.
 #' @family pkgcheck_fns
@@ -24,11 +29,11 @@
 #' summary (checks)
 #' }
 pkgcheck <- function (path = ".", goodpractice = TRUE,
-                      use_cache = TRUE, extra_env = .GlobalEnv) {
+                      use_cache = TRUE, path_strict = TRUE, extra_env = .GlobalEnv) {
 
     options (pkgcheck_extra_env = extra_env)
 
-    path <- convert_path (path)
+    path <- convert_path (path, strict = path_strict)
 
     if (checks_running_in_bg (path)) {
         stop ("Checks are still running in background process.")
