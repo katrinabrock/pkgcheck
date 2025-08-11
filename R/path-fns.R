@@ -3,9 +3,14 @@
 #' Mostly called for side-effects of erroring when path is not root directory of
 #' an R package.
 #' @noRd
-convert_path <- function (path = ".") {
+convert_path <- function (path = ".", strict = TRUE) {
 
     path <- fs::path_norm (path)
+
+    if ( !strict ) if ( !is.null (proj_root <- tryCatch (
+        rprojroot::find_package_root_file (path = path),
+        error = function (e) NULL
+    ))) return (fs::path_norm (proj_root))
 
     # see also https://github.com/r-lib/usethis/blob/master/R/proj.R
     git_root <- tryCatch (

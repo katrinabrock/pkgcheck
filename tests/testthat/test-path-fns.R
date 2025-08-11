@@ -15,6 +15,10 @@ test_that ("convert_path works with pkgdir same as and subdir of git root", {
         # regardless of whether git_root or subdir is provided
         expect_identical (convert_path (git_root), git_root)
         expect_identical (convert_path (sub_dir), git_root)
+
+        # same result with strict = FALSE
+        expect_identical (convert_path (git_root, strict = FALSE), git_root)
+        expect_identical (convert_path (sub_dir, strict = FALSE), git_root)
     })
     with_descriptions (sub_dir, {
         # If description is in subdir,
@@ -22,12 +26,18 @@ test_that ("convert_path works with pkgdir same as and subdir of git root", {
         # regardless of whether git_root or subdir is provided
         expect_identical (convert_path (git_root), sub_dir)
         expect_identical (convert_path (sub_dir), sub_dir)
+
+        # same result with strict = FALSE
+        expect_identical (convert_path (git_root, strict = FALSE), sub_dir)
+        expect_identical (convert_path (sub_dir, strict = FALSE), sub_dir)
     })
     with_descriptions (c (git_root, sub_dir), {
         # If description in both subdir and git root
         # return git root, ignore description in subdir
         expect_identical (convert_path (git_root), git_root)
         expect_identical (convert_path (sub_dir), git_root)
+        # with strict = FALSE, result isn't based on subdir
+        expect_identical (convert_path (sub_dir, strict = FALSE), sub_dir)
     })
 })
 
@@ -83,5 +93,23 @@ test_that ("convert_path errors if description in multiple subdirs", {
         # with a git repo, error is raised if either subdir is provided
         expect_error (convert_path (sub_dirs[1]), err_msg)
         expect_error (convert_path (sub_dirs[2]), err_msg)
+        # with strict = FALSE, multiple subdirs are allowed
+        expect_identical (convert_path (sub_dirs[1], strict = FALSE), sub_dirs[1])
+        expect_identical (convert_path (sub_dirs[2], strict = FALSE), sub_dirs[2])
+    })
+})
+
+test_that ("convert_path errors if packages is too deep in git", {
+    git_root <- fs::as_fs_path (withr::local_tempdir (pkgname ()))
+    grandchild <- fs::as_fs_path (
+        withr::local_tempdir ("grandchild", tmpdir = withr::local_tempdir ("child", tmpdir = git_root))
+    )
+    gert::git_init (git_root)
+    with_descriptions (grandchild, {
+        expect_error (convert_path (git_root), err_msg)
+        # error is raised, since convert_path only looks one level deep
+        expect_error (convert_path (grandchild), err_msg)
+        # with strict = FALSE, grandchildren are allowed
+        expect_identical (convert_path (grandchild, strict = FALSE), grandchild)
     })
 })
